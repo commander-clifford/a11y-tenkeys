@@ -104,7 +104,7 @@ BLANK = 4
 -_-_-_-_-_-_-_-_-_-_ CHANGE THE KEYBOARD BUTTONS -_-_-_-_-_-_-_-_-_-_
 -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ BELOW -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 """
-current_menu = 0 # Menu 1 (0)
+current_menu = 2 # Menu 1 (0)
 keymap = {
     # Menu 1 (0)
     (0): (KEY, "One", [Keycode.ONE]),
@@ -114,10 +114,10 @@ keymap = {
     (4): (KEY, "Five", [Keycode.FIVE]),
 
     (5): (TYPE, "Hello", ("Hello World!")),
-    (6): (KEY, "Select", [Keycode.OPTION, Keycode.SHIFT, Keycode.LEFT_ARROW]),
-    (7): (KEY, "Copy", [Keycode.GUI, Keycode.C]),
-    (8): (KEY, "Paste", [Keycode.GUI, Keycode.V]),
-    (9): (KEY, "Shift", [Keycode.LEFT_SHIFT]),
+    (6): (TYPE, "Hey", ("Hey")),
+    (7): (KEY, "Select", [Keycode.OPTION, Keycode.SHIFT, Keycode.LEFT_ARROW]),
+    (8): (KEY, "Copy", [Keycode.GUI, Keycode.C]),
+    (9): (KEY, "Paste", [Keycode.GUI, Keycode.V]),
 
     # Menu 2 (1)
     (10): (KEY, "A", [Keycode.A]),
@@ -126,11 +126,11 @@ keymap = {
     (13): (KEY, "D", [Keycode.D]),
     (14): (KEY, "E", [Keycode.E]),
 
-    (15): (TYPE, "Goodbye", ("Goodbye World!")),
-    (16): (KEY, "Select", [Keycode.OPTION, Keycode.SHIFT, Keycode.RIGHT_ARROW]),
-    (17): (TYPE, "Goodbye", ("Goodbye World!")),
-    (18): (TYPE, "Goodbye", ("Goodbye World!")),
-    (19): (TYPE, "Goodbye", ("Goodbye World!")),
+    (15): (KEY, "Left", [Keycode.LEFT_ARROW]),
+    (16): (KEY, "Right", [Keycode.RIGHT_ARROW]),
+    (17): (KEY, "Up", [Keycode.UP_ARROW]),
+    (18): (KEY, "Down", [Keycode.DOWN_ARROW]),
+    (19): (KEY, "Select", [Keycode.OPTION, Keycode.SHIFT, Keycode.RIGHT_ARROW]),
 
     # Menu 3 (2)
     (20): (MEDIA, "Vol -", ConsumerControlCode.VOLUME_DECREMENT),
@@ -174,7 +174,7 @@ def build_menu(menu):
             y=((i-5)*12)+4
 
         text_area = label.Label(
-            terminalio.FONT, text=keymap[i+menu][1], color=0xFFFFFF, x=x, y=y
+            terminalio.FONT, text=keymap[i+(menu*10)][1], color=0xFFFFFF, x=x, y=y
         )
         
         circle = Circle(cx, y, 2, fill=0x000000, outline=0xFFFFFF)
@@ -209,14 +209,14 @@ def toggle_dot_label(i, io):
     return
 
 def toggle_to_menu(x):
-    current_menu = x*10
+    current_menu = x
     return
 
 build_menu(current_menu)
 
 while True:
     for button in range(10):
-        key = button + current_menu
+        key = button + (current_menu*10)
         if switch_state[button] == 0:
             if not switches[button].value:
                 toggle_dot_label(button, 1)
