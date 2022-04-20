@@ -121,7 +121,7 @@ keymap = {
     (4): (KEY, "Five", [Keycode.FIVE]),
 
     (5): (TYPE, "Hello", ("Hello World!")),
-    (6): (KEY, "Select", [Keycode.SHIFT, Keycode.LEFT_ARROW]),
+    (6): (KEY, "Select", [Keycode.OPTION, Keycode.SHIFT, Keycode.LEFT_ARROW]),
     (7): (KEY, "Copy", [Keycode.GUI, Keycode.C]),
     (8): (KEY, "Paste", [Keycode.GUI, Keycode.V]),
     (9): (KEY, "Shift", [Keycode.LEFT_SHIFT])
