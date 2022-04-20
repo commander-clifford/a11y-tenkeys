@@ -1,7 +1,8 @@
-# SPDX-FileCopyrightText: 2021 John Park for Adafruit Industries
-# SPDX-License-Identifier: MIT
-# RaspberryPi Pico RP2040 Mechanical Keyboard
 """
+SPDX-FileCopyrightText: 2021 John Park for Adafruit Industries
+SPDX-License-Identifier: MIT
+RaspberryPi Pico RP2040 Mechanical Keyboard
+
 https://docs.circuitpython.org/projects/hid/en/latest/_modules/adafruit_hid/consumer_control_code.html
 https://docs.circuitpython.org/projects/hid/en/latest/_modules/adafruit_hid/mouse.html
 https://docs.circuitpython.org/projects/hid/en/latest/_modules/adafruit_hid/keycode.html
@@ -26,13 +27,11 @@ from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 
 displayio.release_displays()
 
-# Use for I2C
 i2c = busio.I2C(scl=board.GP17, sda=board.GP16)
 display_bus = displayio.I2CDisplay(i2c, device_address=0x3C)
 
-
 WIDTH = 128
-HEIGHT = 64  # Change to 64 if needed
+HEIGHT = 64
 BORDER = 5
 
 display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=WIDTH, height=HEIGHT)
@@ -68,7 +67,7 @@ time.sleep(1)
 
 bg_bitmap = displayio.Bitmap(WIDTH, HEIGHT, 1)
 bg_palette = displayio.Palette(1)
-bg_palette[0] = 0x000000  # White
+bg_palette[0] = 0x000000 # black is OLED pixel off
 
 bg_sprite = displayio.TileGrid(bg_bitmap, pixel_shader=bg_palette, x=0, y=0)
 splash.append(bg_sprite)
@@ -83,7 +82,6 @@ kbd = Keyboard(usb_hid.devices)
 cc = ConsumerControl(usb_hid.devices)
 layout = KeyboardLayoutUS(kbd)
 
-# list of pins to use (skipping GP15 on Pico because it's funky)
 pins = (
     board.GP6,
     board.GP7,
@@ -100,20 +98,22 @@ pins = (
 MEDIA = 1
 KEY = 2
 TYPE = 3
-
-# -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ BELOW -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ #
-# -_-_-_-_-_-_-_-_-_-_ CHANGE THE KEYBOARD BUTTONS -_-_-_-_-_-_-_-_-_-_ #
-# https://docs.circuitpython.org/projects/hid/en/latest/_modules/adafruit_hid/consumer_control_code.html
-# https://docs.circuitpython.org/projects/hid/en/latest/_modules/adafruit_hid/mouse.html
-# https://docs.circuitpython.org/projects/hid/en/latest/_modules/adafruit_hid/keycode.html
-# (MEDIA, ConsumerControlCode.VOLUME_DECREMENT),
-# (MEDIA, ConsumerControlCode.VOLUME_INCREMENT),
-# (TYPE, ("Hello World!\n")),
-# (KEY, [Keycode.ONE]),
-# (KEY, (Keycode.GUI, Keycode.C)),
-# -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ BELOW -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ #
+"""
+-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ BELOW -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+https://docs.circuitpython.org/projects/hid/en/latest/_modules/adafruit_hid/consumer_control_code.html
+https://docs.circuitpython.org/projects/hid/en/latest/_modules/adafruit_hid/mouse.html
+https://docs.circuitpython.org/projects/hid/en/latest/_modules/adafruit_hid/keycode.html
+(MEDIA, ConsumerControlCode.VOLUME_DECREMENT),
+(MEDIA, ConsumerControlCode.VOLUME_INCREMENT),
+(TYPE, ("Hello World!\n")),
+(KEY, [Keycode.ONE]),
+(KEY, (Keycode.GUI, Keycode.C)),
+-_-_-_-_-_-_-_-_-_-_ CHANGE THE KEYBOARD BUTTONS -_-_-_-_-_-_-_-_-_-_
+-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ BELOW -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+"""
 
 keymap = {
+    # Menu 1
     (0): (KEY, "One", [Keycode.ONE]),
     (1): (KEY, "Two", [Keycode.TWO]),
     (2): (KEY, "Three", [Keycode.THREE]),
@@ -124,7 +124,20 @@ keymap = {
     (6): (KEY, "Select", [Keycode.OPTION, Keycode.SHIFT, Keycode.LEFT_ARROW]),
     (7): (KEY, "Copy", [Keycode.GUI, Keycode.C]),
     (8): (KEY, "Paste", [Keycode.GUI, Keycode.V]),
-    (9): (KEY, "Shift", [Keycode.LEFT_SHIFT])
+    (9): (KEY, "Shift", [Keycode.LEFT_SHIFT]),
+
+    # Menu 2
+    (10): (KEY, "A", [Keycode.A]),
+    (11): (KEY, "B", [Keycode.B]),
+    (12): (KEY, "C", [Keycode.C]),
+    (13): (KEY, "D", [Keycode.D]),
+    (14): (KEY, "E", [Keycode.E]),
+
+    (15): (TYPE, "Goodbye", ("Goodbye World!")),
+    (16): (KEY, "Select", [Keycode.OPTION, Keycode.SHIFT, Keycode.RIGHT_ARROW]),
+    (17): (TYPE, "Goodbye", ("Goodbye World!")),
+    (18): (TYPE, "Goodbye", ("Goodbye World!")),
+    (19): (TYPE, "Goodbye", ("Goodbye World!")),
 }
 # -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ ABOVE -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ #
 # -_-_-_-_-_-_-_-_-_-_ CHANGE THE KEYBOARD BUTTONS -_-_-_-_-_-_-_-_-_-_ #
@@ -142,27 +155,31 @@ switch_state = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 """
 Build UI (List of Button Functions)
 """
-for i in range(len(keymap)):
+def build_menu():
+    for i in range(len(pins)):
 
-    if i < 5:
-        cx = 4
-        x = 10
-        y=(i*12)+4
-    else:
-        cx = 68
-        x = 74
-        y=((i-5)*12)+4
+        if i < 5:
+            cx = 4
+            x = 10
+            y=(i*12)+4
+        else:
+            cx = 68
+            x = 74
+            y=((i-5)*12)+4
 
-    text_area = label.Label(
-        terminalio.FONT, text=keymap[i][1], color=0xFFFFFF, x=x, y=y
-    )
+        text_area = label.Label(
+            terminalio.FONT, text=keymap[i+0][1], color=0xFFFFFF, x=x, y=y
+            # terminalio.FONT, text=keymap[i+10][1], color=0xFFFFFF, x=x, y=y
+        )
+        
+        circle = Circle(cx, y, 2, fill=0x000000, outline=0xFFFFFF)
+
+        splash.append(text_area)
+        splash.append(circle)
     
-    circle = Circle(cx, y, 2, fill=0x000000, outline=0xFFFFFF)
+    return
 
-    splash.append(text_area)
-    splash.append(circle)
-
-def draw_dots(i, io):
+def toggle_dot_label(i, io):
 
     print("keypress")
     print(i)
@@ -186,18 +203,22 @@ def draw_dots(i, io):
 
     return
 
+build_menu()
+
 while True:
     for button in range(10):
+        key = button + 0
+        # key = button + 10
         if switch_state[button] == 0:
             if not switches[button].value:
-                draw_dots(button, 1)
+                toggle_dot_label(button, 1)
                 try:
-                    if keymap[button][0] == KEY:
-                        kbd.press(*keymap[button][2])
-                    elif keymap[button][0] == TYPE:
-                        layout.write(keymap[button][2])
+                    if keymap[key][0] == KEY:
+                        kbd.press(*keymap[key][2])
+                    elif keymap[key][0] == TYPE:
+                        layout.write(keymap[key][2])
                     else:
-                        cc.send(keymap[button][2])
+                        cc.send(keymap[key][2])
                 except ValueError:  # deals w six key limit
                     pass
                 switch_state[button] = 1
@@ -205,10 +226,10 @@ while True:
 
         if switch_state[button] == 1:
             if switches[button].value:
-                draw_dots(button, 0)
+                toggle_dot_label(button, 0)
                 try:
-                    if keymap[button][0] == KEY:
-                        kbd.release(*keymap[button][2])
+                    if keymap[key][0] == KEY:
+                        kbd.release(*keymap[key][2])
                 except ValueError:
                     pass
                 switch_state[button] = 0
