@@ -98,22 +98,15 @@ pins = (
 MEDIA = 1
 KEY = 2
 TYPE = 3
+BLANK = 4
 """
 -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ BELOW -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-https://docs.circuitpython.org/projects/hid/en/latest/_modules/adafruit_hid/consumer_control_code.html
-https://docs.circuitpython.org/projects/hid/en/latest/_modules/adafruit_hid/mouse.html
-https://docs.circuitpython.org/projects/hid/en/latest/_modules/adafruit_hid/keycode.html
-(MEDIA, ConsumerControlCode.VOLUME_DECREMENT),
-(MEDIA, ConsumerControlCode.VOLUME_INCREMENT),
-(TYPE, ("Hello World!\n")),
-(KEY, [Keycode.ONE]),
-(KEY, (Keycode.GUI, Keycode.C)),
 -_-_-_-_-_-_-_-_-_-_ CHANGE THE KEYBOARD BUTTONS -_-_-_-_-_-_-_-_-_-_
 -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ BELOW -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 """
-
+current_menu = 0 # Menu 1 (0)
 keymap = {
-    # Menu 1
+    # Menu 1 (0)
     (0): (KEY, "One", [Keycode.ONE]),
     (1): (KEY, "Two", [Keycode.TWO]),
     (2): (KEY, "Three", [Keycode.THREE]),
@@ -126,7 +119,7 @@ keymap = {
     (8): (KEY, "Paste", [Keycode.GUI, Keycode.V]),
     (9): (KEY, "Shift", [Keycode.LEFT_SHIFT]),
 
-    # Menu 2
+    # Menu 2 (1)
     (10): (KEY, "A", [Keycode.A]),
     (11): (KEY, "B", [Keycode.B]),
     (12): (KEY, "C", [Keycode.C]),
@@ -138,6 +131,19 @@ keymap = {
     (17): (TYPE, "Goodbye", ("Goodbye World!")),
     (18): (TYPE, "Goodbye", ("Goodbye World!")),
     (19): (TYPE, "Goodbye", ("Goodbye World!")),
+
+    # Menu 3 (2)
+    (20): (MEDIA, "Vol -", ConsumerControlCode.VOLUME_DECREMENT),
+    (21): (MEDIA, "Vol +", ConsumerControlCode.VOLUME_INCREMENT),
+    (22): (MEDIA, "Mute", ConsumerControlCode.MUTE), 
+    (23): (MEDIA, "Vol -", ConsumerControlCode.VOLUME_DECREMENT), 
+    (24): (MEDIA, "Vol +", ConsumerControlCode.VOLUME_INCREMENT), 
+
+    (25): (MEDIA, ">=", ConsumerControlCode.PLAY_PAUSE), 
+    (26): (MEDIA, ">", ConsumerControlCode.SCAN_NEXT_TRACK), 
+    (27): (MEDIA, "<", ConsumerControlCode.SCAN_PREVIOUS_TRACK), 
+    (28): (MEDIA, "Screen -", ConsumerControlCode.BRIGHTNESS_DECREMENT), 
+    (29): (MEDIA, "Screen +", ConsumerControlCode.BRIGHTNESS_INCREMENT), 
 }
 # -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ ABOVE -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ #
 # -_-_-_-_-_-_-_-_-_-_ CHANGE THE KEYBOARD BUTTONS -_-_-_-_-_-_-_-_-_-_ #
@@ -155,7 +161,7 @@ switch_state = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 """
 Build UI (List of Button Functions)
 """
-def build_menu():
+def build_menu(menu):
     for i in range(len(pins)):
 
         if i < 5:
@@ -168,8 +174,7 @@ def build_menu():
             y=((i-5)*12)+4
 
         text_area = label.Label(
-            terminalio.FONT, text=keymap[i+0][1], color=0xFFFFFF, x=x, y=y
-            # terminalio.FONT, text=keymap[i+10][1], color=0xFFFFFF, x=x, y=y
+            terminalio.FONT, text=keymap[i+menu][1], color=0xFFFFFF, x=x, y=y
         )
         
         circle = Circle(cx, y, 2, fill=0x000000, outline=0xFFFFFF)
@@ -203,12 +208,15 @@ def toggle_dot_label(i, io):
 
     return
 
-build_menu()
+def toggle_to_menu(x):
+    current_menu = x*10
+    return
+
+build_menu(current_menu)
 
 while True:
     for button in range(10):
-        key = button + 0
-        # key = button + 10
+        key = button + current_menu
         if switch_state[button] == 0:
             if not switches[button].value:
                 toggle_dot_label(button, 1)
@@ -223,7 +231,6 @@ while True:
                     pass
                 switch_state[button] = 1
                 
-
         if switch_state[button] == 1:
             if switches[button].value:
                 toggle_dot_label(button, 0)
